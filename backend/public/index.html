@@ -1,0 +1,33 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaborative Editor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.css">
+</head>
+<body style="width: 500px;">
+  <textarea id="editor"></textarea>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+      lineNumbers: true,
+      mode: 'javascript',
+    });
+
+    editor.on('change', () => {
+      const content = editor.getValue();
+      socket.emit('text-update', content);
+    });
+
+    socket.on('text-update', (data) => {
+      editor.setValue(data);
+    });
+  </script>
+</body>
+</html>
