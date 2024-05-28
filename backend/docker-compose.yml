@@ -1,0 +1,13 @@
+version: "3.2"
+
+services:
+  postgres: 
+    image: postgres:14.6
+    restart: always
+    container_name: colab_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=colab_db
+    ports:
+      - 54321:5432
