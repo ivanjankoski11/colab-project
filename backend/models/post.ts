@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 import { Comment } from "./comment";
 
@@ -24,4 +24,7 @@ export class Post extends BaseEntity{
 
     @Column()
     downVotes!: number
+
+    @CreateDateColumn()
+    createdAt?: Date
 }

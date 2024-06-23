@@ -1,7 +1,6 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -10,9 +9,8 @@ import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { IOSSwitch } from "./Switch";
-import { useContext } from "react";
-import { AuthContext } from "../providers/AuthContex";
-
+import { useSocketContext } from "../context/WebSocketContext";
+import { useNavigate } from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(
 	props,
@@ -21,10 +19,17 @@ const Transition = React.forwardRef(function Transition(
 	return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function DialogCoding({ open, setOpen, socket }) {
-	const { user, roomId, setRoomId } = useContext(AuthContext);
+export default function DialogCoding({ open, setOpen }) {
 	const [roomType, setRoomType] = useState("");
 	const [language, setLanguage] = useState("");
+	const { roomId, setRoomId, socket } = useSocketContext();
+	const navigate = useNavigate();
+
+	// React.useEffect(() => {
+	// 	socket.on("userJoined", (value) => {
+	// 		console.log(value);
+	// 	})
+	// }, []);
 
 	const handleLanguage = (e) => {
 		setLanguage(e.target.value);
@@ -36,8 +41,18 @@ export default function DialogCoding({ open, setOpen, socket }) {
 
 	const handleJoinRoom = () => {
 		localStorage.setItem("roomId", roomId);
-		socket.emit("joinRoom", { user, roomId });
+		socket.emit("join", { roomId: roomId });
+		navigate('/coding');
 	}
+
+	const handleCreateRoom = () => {
+		socket.emit("create");
+		navigate('/coding');
+		// socket.emit("createRoom", { user });
+		// setJoin(true);
+		// console.log("Clicked");
+	}
+
 	const handleRoomId = (e) => {
 		setRoomId(e.target.value);
 	}
@@ -94,7 +109,7 @@ export default function DialogCoding({ open, setOpen, socket }) {
 								<IOSSwitch sx={{ m: 1 }} defaultChecked />
 							</div>
 							<div className="flex justify-between items-center w-[68%]">
-								<Button variant="contained" sx={{ paddingX: 3, paddingY: 1 }} color="success">
+								<Button onClick={handleCreateRoom} variant="contained" sx={{ paddingX: 3, paddingY: 1 }} color="success">
 									Create
 								</Button>
 								<Button onClick={() => setRoomType("")} variant="outlined" sx={{ paddingX: 3, paddingY: 1 }}>

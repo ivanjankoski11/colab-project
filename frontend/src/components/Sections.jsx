@@ -7,13 +7,16 @@ import Home from "@mui/icons-material/Home";
 import Person from "@mui/icons-material/Person";
 import Button from "@mui/material/Button";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import { AuthContext } from "../providers/AuthContex";
 import AskQuestion from "../components/AskQuestion";
 import Post from "./Post";
 import { useNavigate } from "react-router-dom";
 import Users from "../pages/Users";
+import SearchPage from "../pages/Search";
 import axios from "axios";
 import { useState, useEffect, useContext } from "react";
+import { useAuthContext } from "../context/AuthContext";
+import { useSocketContext } from "../context/WebSocketContext";
+import { useDataContext } from "../context/DataContext";
 
 function TabPanel(props) {
 	const { children, value, index, ...other } = props;
@@ -43,30 +46,22 @@ function a11yProps(index) {
 	};
 }
 
-export default function Section({ handleLogout }) {
-	const [posts, setPosts] = useState([]);
-	const [value, setValue] = React.useState(0);
+export default function Section({ value, setValue }) {
+	const { posts } = useDataContext();
 	const navigate = useNavigate();
-	const { user, socket } = useContext(AuthContext);
+	const { authUser } = useAuthContext();
+	const { socket } = useSocketContext();
 
-	const fetchPosts = async () => {
-		const response = await axios.get("http://localhost:3001/posts");
-		setPosts(response.data.posts);
-	};
-
-	useEffect(() => {
-		fetchPosts();
-	}, []);
 	const handleChange = (event, newValue) => {
+		console.log(newValue);
 		setValue(newValue);
 	};
 
 	const logOut = () => {
-		localStorage.removeItem("user");
-		handleLogout();
-				if (socket) {
-					socket.disconnect();
-				}
+		localStorage.removeItem("authUser");
+		if (socket) {
+			socket.disconnect();
+		}
 		navigate("/login");
 	};
 
@@ -74,7 +69,6 @@ export default function Section({ handleLogout }) {
 		<Box
 			sx={{
 				flexGrow: 1,
-				bgcolor: "background.paper",
 				display: "flex",
 				justifyContent: "center",
 				height: "100%",
@@ -92,7 +86,7 @@ export default function Section({ handleLogout }) {
 					paddingTop: "20px",
 					paddingRight: "30px",
 					borderRight: 1,
-					borderColor: "divider",
+					borderColor: "#5c5c5c",
 					"& .MuiTab-label": {
 						textTransform: "none", // Prevent text transformation to uppercase
 					},
@@ -103,12 +97,12 @@ export default function Section({ handleLogout }) {
 						<div
 							className="flex items-center justify-start gap-2 rounded-lg px-5 py-2"
 							style={{
-								backgroundColor: value === 0 ? "#FBECC6" : "inherit",
+								backgroundColor: value === 0 ? "#3d444a" : "inherit",
 								textTransform: "none",
 							}}
 						>
-							<Home sx={{ color: "#666666" }} />
-							<p className="text-[#666666]">Home</p>
+							<Home sx={{ color: "#dbdbdb" }} />
+							<p className="text-[#dbdbdb]">Home</p>
 						</div>
 					}
 					{...a11yProps(0)}
@@ -122,12 +116,12 @@ export default function Section({ handleLogout }) {
 						<div
 							className="flex items-center justify-start gap-2 rounded-lg px-5 py-2"
 							style={{
-								backgroundColor: value === 1 ? "#FBECC6" : "inherit",
+								backgroundColor: value === 1 ? "#3d444a" : "inherit",
 								textTransform: "none",
 							}}
 						>
-							<Person sx={{ color: "#666666" }} />
-							<p className="text-[#666666]">Users</p>
+							<Person sx={{ color: "#dbdbdb" }} />
+							<p className="text-[#dbdbdb]">Users</p>
 						</div>
 					}
 					{...a11yProps(1)}
@@ -147,7 +141,7 @@ export default function Section({ handleLogout }) {
 			</Tabs>
 			<TabPanel value={value} index={0}>
 				<div className="px-8 mb-5" style={{ marginBottom: "100px" }}>
-					<AskQuestion name={user.name} lastname={user.lastname}/>
+					<AskQuestion name={authUser.name} lastname={authUser.lastname} />
 					{posts.map((post) => {
 						return <Post post={post} />;
 					})}
@@ -155,6 +149,9 @@ export default function Section({ handleLogout }) {
 			</TabPanel>
 			<TabPanel value={value} index={1}>
 				<Users />
+			</TabPanel>
+			<TabPanel value={value} index={2}>
+				<SearchPage />
 			</TabPanel>
 		</Box>
 	);

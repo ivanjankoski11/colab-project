@@ -1,17 +1,17 @@
 import React from "react";
 import { TextField, Button } from "@mui/material";
 import { useState, useContext } from "react";
-import { AuthContext } from "../providers/AuthContex";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [errorMessage, setErrorMessage] = useState(null); // New state for handling error messages
-	const { setToken } = useContext(AuthContext);
-	const { setUser, socket } = useContext(AuthContext);
+	const [errorMessage, setErrorMessage] = useState(null);
+	const { setAuthUser } = useContext(AuthContext);
 	const navigate = useNavigate();
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
@@ -19,24 +19,12 @@ const Login = () => {
 				email: username,
 				password,
 			});
-			setToken(response.data.token);
-			setUser(response.data.user);
+            setAuthUser(response.data.user);
 			console.log(response.data.user);
-			localStorage.setItem("token", response.data.token);
-			localStorage.setItem(
-				"user",
-				JSON.stringify({
-					name: response.data.user.name,
-					lastname: response.data.user.lastname,
-					username: response.data.user.username,
-				}),
-			);
+			localStorage.setItem("authUser", JSON.stringify(response.data.user));
 			navigate("/");
 		} catch (error) {
 			console.error("Authentication failed:", error);
-			setToken(null);
-			localStorage.removeItem("token");
-			localStorage.removeItem("user");
 			if (error.response && error.response.data) {
 				setErrorMessage(error.response.data.message);
 			} else {
@@ -82,7 +70,9 @@ const Login = () => {
 			</div>
 			<div>
 				<h1 className="text-8xl text-white font-bold">Colab</h1>
-				<h3 className="text-white text-lg font-medium">Developers platform for sharing code and collaborating</h3>
+				<h3 className="text-white text-lg font-medium">
+					Developers platform for sharing code and collaborating
+				</h3>
 			</div>
 		</div>
 	);

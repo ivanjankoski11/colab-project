@@ -1,17 +1,23 @@
-import { NextFunction, Request, Response } from "express";
+export const javaScriptController = (code: any) => {
+	const logs: any[] = []; // Array to store console.log outputs
 
-export const javaScriptController = async (req: Request, res: Response, next: NextFunction) => {
 	const originalLog = console.log;
 	console.log = function (...value) {
 		originalLog.apply(console, value);
+		logs.push(value); // Store console.log output in the logs array
 		return value;
 	};
-	const output = eval('console.log("hello")');
+
 	try {
-		const { code } = req.body;
-		const result = eval(code); // Execute code (use a safer method in production)
-		res.json({ result });
+		// Execute the code
+		eval(code);
+
+		// Restore original console.log function
+		console.log = originalLog;
+
+		return logs; // Return array containing all console.log outputs
 	} catch (error: any) {
-		res.status(500).json({ error: error.message });
+		console.log(error);
+		return []; // Return an empty array if an error occurs
 	}
 };

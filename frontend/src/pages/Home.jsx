@@ -1,37 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { useContext } from "react";
-import { AuthContext } from "../providers/AuthContex";
-import { Navigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import io, { connect } from "socket.io-client";
+import DialogCoding from "../components/CodingDialog";
 import Section from "../components/Sections";
 import SectionPost from "../components/SectionPost";
-import DialogCoding from "../components/CodingDialog";
 
-const Home = ({ handleLogout }) => {
-	const { token, loading, socket } = useContext(AuthContext);
+export const Home = ({value, setValue}) => {
 	const [open, setOpen] = useState(false);
-
-	if (loading) {
-		return null;
-	}
-	if (!token) {
-		return <Navigate to="/login" replace />;
-	}
-	
+	const navigate = useNavigate();
 
 	return (
-		<div className="h-[100vh] flex flex-col" style={{ overflowY: "hidden" }}>
-			<DialogCoding open={open} setOpen={setOpen} socket={socket} />
-			<Navbar open={open} setOpen={setOpen} socket={socket} />
+		<div className="h-[100vh] flex flex-col bg-[#2e3235]" style={{ overflowY: "hidden" }}>
+			<DialogCoding open={open} setOpen={setOpen} />
+			<Navbar setOpen={setOpen} value={value} setValue={setValue} />
 			<div className="h-[100%] flex w-[80vw] m-auto sticky top-0">
 				<div className="w-3/4">
-					<Section handleLogout={handleLogout} />
+					<Section value={value} setValue={setValue} />
 				</div>
-				<div className="w-1/4 pt-10 flex flex-col gap-3 pl-5">
+				<div className="w-1/4 pt-10 flex flex-col gap-4 pl-5">
 					<SectionPost
 						title={"The Colab Blog"}
-						content={["Is AI make your code worse?", "Data is more powerful then ever"]}
+						content={[
+							"Is AI make your code worse?",
+							"Data is more powerful then ever",
+						]}
 					/>
 					<SectionPost
 						title={"Featured on Meta"}
